@@ -13,11 +13,13 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Calendar } from "primereact/calendar";
 import { InputMask } from 'primereact/inputmask';
-import { Dropdown } from 'primereact/dropdown';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { AnimalService } from '../../demo/service/AnimalService';
 import { Demo } from '@/types';
 
 import { useAnimalData } from './hooks/useAnimalData';
+import { useAnimalMutate } from './hooks/useAnimalMutate';
+import { AnimalData } from './interfaces/animal-data';
 
 interface DropdownItem {
     name: string;
@@ -25,8 +27,8 @@ interface DropdownItem {
 
 /* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
 const Crud = () => {
-    let emptyAnimal: Demo.Animal = {
-        id: '',
+    let emptyAnimal:AnimalData = {
+        id: 0,
         name: '',
         description: '',
         imageUrl: '',
@@ -36,13 +38,14 @@ const Crud = () => {
         idade: 0
     };
 
-    // Create a client
+    // Create a animal
     const { data, isLoading } = useAnimalData();
+    const { mutate } = useAnimalMutate();
 
     const [animals, setAnimals] = useState(null);
     const [animalDialog, setAnimalDialog] = useState(false);
     const [deleteAnimalDialog, setDeleteAnimalDialog] = useState(false);
-    const [animal, setAnimal] = useState<Demo.Animal>(emptyAnimal);
+    const [animal, setAnimal] = useState<AnimalData>(emptyAnimal);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
@@ -87,12 +90,15 @@ const Crud = () => {
         setSubmitted(true);
 
         if (animal.name.trim()) {
-            let _animals = [...(animals as any)];
-            let _animal = { ...animal };
+          //  let _animals = [...(animals as any)];
+        //    let _animal = { ...animal };
             if (animal.id) {
                 const index = findIndexById(animal.id);
 
-                _animals[index] = _animal;
+              console.log("com ID: "+animal);
+
+             //   _animals[index] = _animal;
+
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
@@ -100,10 +106,24 @@ const Crud = () => {
                     life: 3000
                 });
             } else {
-                
+                console.log("Sem ID: "+animal);
                 //persistir no banco
 
-                _animals.push(_animal);
+                const dataPersist = {
+                    "id": animal.id,
+                    "name": animal.name,
+                    "description": animal.description,
+                    "imageUrl": animal.imageUrl,
+                    "birthDate": animal.birthDate,
+                    "idade": 0,
+                    "category": animal.category,
+                    "status": animal.status 
+                }
+
+                mutate(dataPersist);
+
+            //    _animals.push(_animal);
+
                 toast.current?.show({
                     severity: 'success',
                     summary: 'Successful',
@@ -112,18 +132,18 @@ const Crud = () => {
                 });
             }
 
-            setAnimals(_animals as any);
+          //  setAnimals(_animals as any);
             setAnimalDialog(false);
             setAnimal(emptyAnimal);
         }
     };
 
-    const editAnimal = (animal: Demo.Animal) => {
+    const editAnimal = (animal: AnimalData) => {
         setAnimal({ ...animal });
         setAnimalDialog(true);
     };
 
-    const confirmDeleteAnimal = (animal: Demo.Animal) => {
+    const confirmDeleteAnimal = (animal: AnimalData) => {
         setAnimal(animal);
         setDeleteAnimalDialog(true);
     };
@@ -141,7 +161,7 @@ const Crud = () => {
         });
     };
 
-    const findIndexById = (id: string) => {
+    const findIndexById = (id: number) => {
         let index = -1;
         for (let i = 0; i < (animals as any)?.length; i++) {
             if ((animals as any)[i].id === id) {
@@ -159,6 +179,12 @@ const Crud = () => {
         setAnimal(_animal);
     };
 
+    const onStatusChange = (e: RadioButtonChangeEvent) => {
+        let _animal = { ...animal };
+        _animal['status'] = e.value;
+        setAnimal(_animal);
+    };
+
     const onNameChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
         let _animal = { ...animal };
@@ -167,10 +193,26 @@ const Crud = () => {
         setAnimal(_animal);
     };
 
+    const onImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+        const val = (e.target && e.target.value) || '';
+        let _animal = { ...animal };
+        _animal['imageUrl'] = val;
+
+        setAnimal(_animal);
+    };
+
     const onDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>, description: string) => {
         const val = (e.target && e.target.value) || '';
         let _animal = { ...animal };
         _animal['description'] = val;
+
+        setAnimal(_animal);
+    };
+
+    const onBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>, birthDate: string) => {
+        const val = (e.target && e.target.value) || '';
+        let _animal = { ...animal };
+        _animal['birthDate'] = val;
 
         setAnimal(_animal);
     };
@@ -194,7 +236,7 @@ const Crud = () => {
         );
     };
 
-    const idBodyTemplate = (rowData: Demo.Animal) => {
+    const idBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
                 <span className="p-column-title">Code</span>
@@ -203,7 +245,7 @@ const Crud = () => {
         );
     };
 
-    const nameBodyTemplate = (rowData: Demo.Animal) => {
+    const nameBodyTemplate = (rowData:AnimalData) => {
         return (
             <>
                 <span className="p-column-title">Name</span>
@@ -212,7 +254,7 @@ const Crud = () => {
         );
     };
 
-    const imageBodyTemplate = (rowData: Demo.Animal) => {
+    const imageBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
                 <span className="p-column-title">Image</span>
@@ -222,7 +264,7 @@ const Crud = () => {
     };
 
 
-    const birthDateBodyTemplate = (rowData: Demo.Animal) => {
+    const birthDateBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
                 <span className="p-column-title">Data de Nascimento</span>
@@ -240,7 +282,7 @@ const Crud = () => {
         );
     };
 
-    const categoryBodyTemplate = (rowData: Demo.Animal) => {
+    const categoryBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
                 <span className="p-column-title">Category</span>
@@ -250,7 +292,7 @@ const Crud = () => {
     };
 
 
-    const statusBodyTemplate = (rowData: Demo.Animal) => {
+    const statusBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
                 <span className="p-column-title">Status</span>
@@ -259,7 +301,7 @@ const Crud = () => {
         );
     };
 
-    const actionBodyTemplate = (rowData: Demo.Animal) => {
+    const actionBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
                 <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editAnimal(rowData)} />
@@ -343,10 +385,25 @@ const Crud = () => {
                             <label htmlFor="description">Description</label>
                             <InputTextarea id="description" value={animal.description} onChange={(e) => onDescriptionChange(e, 'description')} required rows={3} cols={20} />
                         </div>
-
+                        <div className="field">
+                            <label htmlFor="imageUrl">Imagem URL</label>
+                            <InputText
+                                id="imageUrl"
+                                value={animal.imageUrl}
+                                onChange={(e) => onImageUrlChange(e, 'imageUrl')}
+                                required
+                                autoFocus
+                                className={classNames({
+                                    'p-invalid': submitted && !animal.name
+                                })}
+                            />
+                            {submitted && !animal.name && <small className="p-invalid">Name is required.</small>}
+                        </div>       
                         <div className="field">
                             <label htmlFor="birthDate">Data de Nascimento</label>
-                            <InputMask value={animal.birthDate} onChange={(e) => setCalendarValue(e.target.value)} mask="99/99/9999" placeholder="dd/mm/aaaa" />
+                            <InputMask  value={animal.birthDate} 
+                                        slotChar='mm/dd/yyyy' mask="99/99/9999" placeholder="dd/mm/aaaa"
+                                        onChange={(e) => onBirthDateChange(e, 'birthDate')} />
                         </div>
 
                         <div className="field">
@@ -364,12 +421,17 @@ const Crud = () => {
                         </div>
 
                         <div className="field">
-
-                        <div className="field col-12 md:col-6">
-                            <label htmlFor="state">Status</label>
-                            <Dropdown id="state" value={dropdownItem} onChange={(e) => setDropdownItem(e.value)} options={dropdownItems}  optionLabel="name" placeholder="Selecione"></Dropdown>
-                        </div>
-
+                            <label className="mb-3">Status</label>
+                            <div className="formgrid grid">
+                                <div className="field-radiobutton col-6">
+                                    <RadioButton inputId="status1" name="status" value="ADOTADO" onChange={onStatusChange} checked={animal.status === 'ADOTADO'} />
+                                    <label htmlFor="status1">Adotado</label>
+                                </div>
+                                <div className="field-radiobutton col-6">
+                                    <RadioButton inputId="status2" name="status" value="DISPONIVEL" onChange={onStatusChange} checked={animal.status === 'DISPONIVEL'} />
+                                    <label htmlFor="status2">Disponivel</label>
+                                </div>
+                            </div>
                         </div>
 
                        
