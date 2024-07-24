@@ -22,13 +22,13 @@ public final class Animal implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "birth_date", columnDefinition = "DATE",nullable = false)
+    @Column(name = "birth_date", columnDefinition = "DATE")
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
@@ -36,7 +36,7 @@ public final class Animal implements Serializable {
     private Category category;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private Status status;
 
     @Transient

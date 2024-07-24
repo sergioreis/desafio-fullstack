@@ -48,7 +48,7 @@ public class AnimalService {
     }
 
     public List<Animal> findAll() {
-        return repository.findAll();
+        return repository.findByOrderByNameAsc();
     }
 
     private void updateObjectStatus(Animal newObj, Animal obj) {

@@ -92,6 +92,9 @@ public class AnimalDTO implements Serializable {
     }
 
     public Status getStatus() {
+        if(status == null){
+            status = Status.DISPONIVEL;
+        }
         return status;
     }
 

@@ -16,7 +16,7 @@ import { InputMask, InputMaskChangeEvent } from 'primereact/inputmask';
 import { Demo } from '@/types';
 
 import { useAnimalData } from './hooks/useAnimalData';
-import { useAnimalMutate } from './hooks/useAnimalMutate';
+import { useAnimalMutate,useAnimalMutatePut } from './hooks/useAnimalMutate';
 import { AnimalData } from './interfaces/animal-data';
 
 interface DropdownItem {
@@ -38,11 +38,12 @@ const Crud = () => {
 
     // Create a animal
     const { data, isLoading } = useAnimalData();
-    const { mutate, isSuccess, isPending } = useAnimalMutate();
+    const { mutate:mutatePost, isSuccess:isSuccessPost, isPending } = useAnimalMutate();
+    const { mutate:mutatePut, isSuccess:isSuccessPut} = useAnimalMutatePut();
 
     const [animals, setAnimals] = useState(null);
     const [animalDialog, setAnimalDialog] = useState(false);
-    const [deleteAnimalDialog, setDeleteAnimalDialog] = useState(false);
+    const [alterarStatusAnimalDialog, setAlterarStatusAnimalDialog] = useState(false);
     const [animal, setAnimal] = useState<AnimalData>(emptyAnimal);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
@@ -68,12 +69,12 @@ const Crud = () => {
         setAnimalDialog(false);
     };
 
-    const hideDeleteAnimalDialog = () => {
-        setDeleteAnimalDialog(false);
+    const hideAlterareAnimalDialog = () => {
+        setAlterarStatusAnimalDialog(false);
     };
 
     const hideDeleteAnimalsDialog = () => {
-        setDeleteAnimalDialog(false);
+        setAlterarStatusAnimalDialog(false);
     };
 
     const saveAnimal = () => {
@@ -81,20 +82,6 @@ const Crud = () => {
 
         if (animal.name.trim()) {
        
-            if (animal.id) {
-                const index = findIndexById(animal.id);
-
-                if(isSuccess){
-                    toast.current?.show({
-                        severity: 'success',
-                        summary: 'Successful',
-                        detail: 'Animal Updated',
-                        life: 3000
-                    });
-                }
-
-               
-            } else {
               
                 const dataPersist = {
                     "id": animal.id,
@@ -119,47 +106,50 @@ const Crud = () => {
                     });
                 }
 
-                
-            }
-
             setAnimalDialog(false);
             setAnimal(emptyAnimal);
         }
     };
 
+    /**
     const editAnimal = (animal: AnimalData) => {
         setAnimal({ ...animal });
         setAnimalDialog(true);
-    };
+    }; */
 
-    const confirmDeleteAnimal = (animal: AnimalData) => {
+    const confirmAlterarStatusAnimal = (animal: AnimalData) => {
         setAnimal(animal);
-        setDeleteAnimalDialog(true);
+        setAlterarStatusAnimalDialog(true);
     };
 
-    const deleteAnimal = () => {
-        let _animals = (animals as any)?.filter((val: any) => val.id !== animal.id);
-        setAnimals(_animals);
-        setDeleteAnimalDialog(false);
-        setAnimal(emptyAnimal);
-        toast.current?.show({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Animal Deleted',
-            life: 3000
-        });
-    };
+    const alterarStatusAnimal = () => {
+        setSubmitted(true);
 
-    const findIndexById = (id: number) => {
-        let index = -1;
-        for (let i = 0; i < (animals as any)?.length; i++) {
-            if ((animals as any)[i].id === id) {
-                index = i;
-                break;
-            }
+        const dataPersist = {
+            "id": animal.id,
+            "name": animal.name,
+            "description": animal.description,
+            "imageUrl": animal.imageUrl,
+            "birthDate": animal.birthDate,
+            "idade": 0,
+            "category": animal.category,
+            "status": animal.status == 'ADOTADO' ? 'DISPONIVEL' : 'ADOTADO' 
         }
 
-        return index;
+        mutatePut(dataPersist);
+
+        if(isSuccessPut){
+
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Status Alterado',
+                life: 3000
+            });
+        }
+
+        setAlterarStatusAnimalDialog(false);
+        setAnimal(emptyAnimal); 
     };
 
     const onCategoryChange = (e: RadioButtonChangeEvent) => {
@@ -243,6 +233,15 @@ const Crud = () => {
         );
     };
 
+    const descricaoBodyTemplate = (rowData:AnimalData) => {
+        return (
+            <>
+                <span className="p-column-title">Descrição</span>
+                {rowData.description}
+            </>
+        );
+    };
+
     const imageBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
@@ -258,6 +257,15 @@ const Crud = () => {
             <>
                 <span className="p-column-title">Data de Nascimento</span>
                 {rowData.birthDate}
+            </>
+        );
+    };
+
+    const idadeBodyTemplate = (rowData: AnimalData) => {
+        return (
+            <>
+                <span className="p-column-title">Idade</span>
+                {rowData.idade}
             </>
         );
     };
@@ -293,8 +301,9 @@ const Crud = () => {
     const actionBodyTemplate = (rowData: AnimalData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editAnimal(rowData)} />
-                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteAnimal(rowData)} />
+                {/* <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editAnimal(rowData)} />*/} 
+              
+                <Button icon="pi pi-check-square" rounded severity="warning" onClick={() => confirmAlterarStatusAnimal(rowData)} />
             </>
         );
     };
@@ -315,10 +324,10 @@ const Crud = () => {
             <Button label="Save" icon="pi pi-check" text onClick={saveAnimal} />
         </>
     );
-    const deleteAnimalDialogFooter = (
+    const alterarStatusAnimalDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteAnimalsDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteAnimal} />
+            <Button label="Yes" icon="pi pi-check" text onClick={alterarStatusAnimal} />
         </>
     );
 
@@ -347,9 +356,11 @@ const Crud = () => {
                        
                         <Column field="id" header="ID" body={idBodyTemplate}  headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="name" header="Nome" body={nameBodyTemplate}  headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="descricao" header="Descrição" body={descricaoBodyTemplate}  headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column header="Imagem" body={imageBodyTemplate}></Column>
                         <Column field="categoria" header="Categoria" body={categoryBodyTemplate}  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="birthDate" header="Data de Nascimento" body={birthDateBodyTemplate}  ></Column>
+                        <Column field="idade" header="Idade" body={idadeBodyTemplate}  ></Column>
                         <Column field="status" header="Status" body={statusBodyTemplate}  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
@@ -368,7 +379,7 @@ const Crud = () => {
                                     'p-invalid': submitted && !animal.name
                                 })}
                             />
-                            {submitted && !animal.name && <small className="p-invalid">Name is required.</small>}
+                            {submitted && !animal.name && <small className="p-invalid">Nome é obrigatorio.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
@@ -380,13 +391,7 @@ const Crud = () => {
                                 id="imageUrl"
                                 value={animal.imageUrl}
                                 onChange={(e) => onImageUrlChange(e, 'imageUrl')}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    'p-invalid': submitted && !animal.name
-                                })}
                             />
-                            {submitted && !animal.name && <small className="p-invalid">Name is required.</small>}
                         </div>       
                         <div className="field">
                             <label htmlFor="birthDate">Data de Nascimento</label>
@@ -399,19 +404,24 @@ const Crud = () => {
                             <label className="mb-3">Categoria</label>
                             <div className="formgrid grid">
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category1" required name="category"  value="CACHORRO" onChange={onCategoryChange} checked={animal.category === 'CACHORRO'}  autoFocus
+                                    <RadioButton inputId="category1"  name="category"  value="CACHORRO" onChange={onCategoryChange} checked={animal.category === 'CACHORRO'}  
+                                    required
+                                   
                                     className={classNames({
                                         'p-invalid': submitted && !animal.category
                                     })} />
                                     <label htmlFor="category1">Cachorro</label>
                                 </div>
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category2"  required name="category" value="GATO" onChange={onCategoryChange} checked={animal.category === 'GATO'}  autoFocus
+                                    <RadioButton inputId="category2"   name="category" value="GATO" onChange={onCategoryChange} checked={animal.category === 'GATO'}  
+                                    required
+                                    
                                     className={classNames({
                                         'p-invalid': submitted && !animal.category
                                     })} />
                                     <label htmlFor="category2">Gato</label>
                                 </div>
+                                {submitted && !animal.name && <small className="p-invalid">Categoria é obrigatoria.</small>}
                             </div>
                         </div>
 
@@ -419,32 +429,27 @@ const Crud = () => {
                             <label className="mb-3">Status</label>
                             <div className="formgrid grid">
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="status1" name="status" value="ADOTADO" onChange={onStatusChange} checked={animal.status === 'ADOTADO'}  required
-                                    autoFocus
-                                    className={classNames({
-                                        'p-invalid': submitted && !animal.status
-                                    })} />
+                                    <RadioButton inputId="status1" name="status" value="ADOTADO" onChange={onStatusChange} checked={animal.status === 'ADOTADO'}  />
                                     <label htmlFor="status1">Adotado</label>
                                 </div>
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="status2" name="status" value="DISPONIVEL" onChange={onStatusChange} checked={animal.status === 'DISPONIVEL'}  autoFocus
-                                    className={classNames({
-                                        'p-invalid': submitted && !animal.status
-                                    })}/>
+                                    <RadioButton inputId="status2" name="status" value="DISPONIVEL" onChange={onStatusChange} checked={animal.status === 'DISPONIVEL'} />
                                     <label htmlFor="status2">Disponivel</label>
                                 </div>
+
+                                {submitted && !animal.status && <small className="p-invalid">OBS: O status será definido para DISPONIVEL.</small>}
                             </div>
                         </div>
 
                        
                     </Dialog>
 
-                    <Dialog visible={deleteAnimalDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteAnimalDialogFooter} onHide={hideDeleteAnimalDialog}>
+                    <Dialog visible={alterarStatusAnimalDialog} style={{ width: '450px' }} header="Confirmar" modal footer={alterarStatusAnimalDialogFooter} onHide={hideAlterareAnimalDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {animal && (
                                 <span>
-                                    Are you sure you want to delete <b>{animal.name}</b>?
+                                    Alterar o status de <b>{animal.status}</b> para <b>{animal.status == 'ADOTADO' ? 'DISPONIVEL' : 'ADOTADO' }</b>?
                                 </span>
                             )}
                         </div>

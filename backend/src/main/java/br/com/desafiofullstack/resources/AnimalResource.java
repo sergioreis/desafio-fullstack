@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/animals")
-@CrossOrigin(origins = "*")
 public class AnimalResource {
 
     @Autowired
