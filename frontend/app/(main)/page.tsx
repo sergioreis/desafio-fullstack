@@ -17,6 +17,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { AnimalService } from '../../demo/service/AnimalService';
 import { Demo } from '@/types';
 
+import { useAnimalData } from './hooks/useAnimalData';
+
 interface DropdownItem {
     name: string;
 }
@@ -33,6 +35,9 @@ const Crud = () => {
         status: '',
         idade: 0
     };
+
+    // Create a client
+    const { data, isLoading } = useAnimalData();
 
     const [animals, setAnimals] = useState(null);
     const [animalDialog, setAnimalDialog] = useState(false);
@@ -52,10 +57,11 @@ const Crud = () => {
         []
     );
 
-
+    /** 
     useEffect(() => {
-        AnimalService.getAnimals().then((data) => setAnimals(data as any));
+        AnimalService.getAnimalsJSON().then((data) => setAnimals(data as any));
     }, []);
+    */
 
 
     const openNew = () => {
@@ -294,7 +300,7 @@ const Crud = () => {
 
                     <DataTable
                         ref={dt}
-                        value={animals}
+                        value={data}
                         dataKey="id"
                         paginator
                         rows={10}
