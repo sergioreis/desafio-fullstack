@@ -11,10 +11,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Calendar } from "primereact/calendar";
 import { InputMask, InputMaskChangeEvent } from 'primereact/inputmask';
-import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-import { AnimalService } from '../../demo/service/AnimalService';
+
 import { Demo } from '@/types';
 
 import { useAnimalData } from './hooks/useAnimalData';
@@ -50,15 +48,7 @@ const Crud = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const [calendarValue, setCalendarValue] = useState<any>(null);
-    const [dropdownItem, setDropdownItem] = useState<DropdownItem | null>(null);
-    const dropdownItems: DropdownItem[] = useMemo(
-        () => [
-            { name: 'ADOTADO'},
-            { name: 'DISPONIVEL'}
-        ],
-        []
-    );
+
 
     /** 
     useEffect(() => {
@@ -90,25 +80,22 @@ const Crud = () => {
         setSubmitted(true);
 
         if (animal.name.trim()) {
-             // let _animals = [...(animals as any)];
-        //    let _animal = { ...animal };
+       
             if (animal.id) {
                 const index = findIndexById(animal.id);
 
-              console.log("com ID: "+animal);
+                if(isSuccess){
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Successful',
+                        detail: 'Animal Updated',
+                        life: 3000
+                    });
+                }
 
-             //   _animals[index] = _animal;
-
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Animal Updated',
-                    life: 3000
-                });
+               
             } else {
-                console.log("Sem ID: "+animal);
-                //persistir no banco
-
+              
                 const dataPersist = {
                     "id": animal.id,
                     "name": animal.name,
@@ -135,7 +122,6 @@ const Crud = () => {
                 
             }
 
-           // setAnimals(_animals as any);
             setAnimalDialog(false);
             setAnimal(emptyAnimal);
         }
@@ -413,11 +399,17 @@ const Crud = () => {
                             <label className="mb-3">Categoria</label>
                             <div className="formgrid grid">
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category1" name="category" value="CACHORRO" onChange={onCategoryChange} checked={animal.category === 'CACHORRO'} />
+                                    <RadioButton inputId="category1" required name="category"  value="CACHORRO" onChange={onCategoryChange} checked={animal.category === 'CACHORRO'}  autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !animal.category
+                                    })} />
                                     <label htmlFor="category1">Cachorro</label>
                                 </div>
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category2" name="category" value="GATO" onChange={onCategoryChange} checked={animal.category === 'GATO'} />
+                                    <RadioButton inputId="category2"  required name="category" value="GATO" onChange={onCategoryChange} checked={animal.category === 'GATO'}  autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !animal.category
+                                    })} />
                                     <label htmlFor="category2">Gato</label>
                                 </div>
                             </div>
@@ -427,11 +419,18 @@ const Crud = () => {
                             <label className="mb-3">Status</label>
                             <div className="formgrid grid">
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="status1" name="status" value="ADOTADO" onChange={onStatusChange} checked={animal.status === 'ADOTADO'} />
+                                    <RadioButton inputId="status1" name="status" value="ADOTADO" onChange={onStatusChange} checked={animal.status === 'ADOTADO'}  required
+                                    autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !animal.status
+                                    })} />
                                     <label htmlFor="status1">Adotado</label>
                                 </div>
                                 <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="status2" name="status" value="DISPONIVEL" onChange={onStatusChange} checked={animal.status === 'DISPONIVEL'} />
+                                    <RadioButton inputId="status2" name="status" value="DISPONIVEL" onChange={onStatusChange} checked={animal.status === 'DISPONIVEL'}  autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !animal.status
+                                    })}/>
                                     <label htmlFor="status2">Disponivel</label>
                                 </div>
                             </div>
