@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class AnimalDTO implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -25,7 +26,7 @@ public class AnimalDTO implements Serializable {
     @Length(max = 4000,message = "O tamanho maximo de 4000 caracteres.")
     private String imageUrl;
 
-    private LocalDate birthDate;
+    private String birthDate;
 
     private int idade;
 
@@ -43,10 +44,19 @@ public class AnimalDTO implements Serializable {
         name = obj.getName();
         description = obj.getDescription();
         imageUrl = obj.getImageUrl();
-        birthDate = obj.getBirthDate();
+        birthDate = localeDateToString(obj.getBirthDate());
         idade = obj.getAge();
         category = obj.getCategory();
         status = obj.getStatus();
+    }
+
+    private String localeDateToString(LocalDate localDate){
+        String formatedString = "";
+        if(localDate != null){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            formatedString =  localDate.format(formatter);
+        }
+        return formatedString;
     }
 
     public Integer getId() {
@@ -97,11 +107,11 @@ public class AnimalDTO implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public LocalDate getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 

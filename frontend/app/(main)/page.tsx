@@ -12,7 +12,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Calendar } from "primereact/calendar";
-import { InputMask } from 'primereact/inputmask';
+import { InputMask, InputMaskChangeEvent } from 'primereact/inputmask';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { AnimalService } from '../../demo/service/AnimalService';
 import { Demo } from '@/types';
@@ -40,7 +40,7 @@ const Crud = () => {
 
     // Create a animal
     const { data, isLoading } = useAnimalData();
-    const { mutate } = useAnimalMutate();
+    const { mutate, isSuccess, isPending } = useAnimalMutate();
 
     const [animals, setAnimals] = useState(null);
     const [animalDialog, setAnimalDialog] = useState(false);
@@ -90,7 +90,7 @@ const Crud = () => {
         setSubmitted(true);
 
         if (animal.name.trim()) {
-          //  let _animals = [...(animals as any)];
+             // let _animals = [...(animals as any)];
         //    let _animal = { ...animal };
             if (animal.id) {
                 const index = findIndexById(animal.id);
@@ -122,17 +122,20 @@ const Crud = () => {
 
                 mutate(dataPersist);
 
-            //    _animals.push(_animal);
+                if(isSuccess){
+                    
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Successful',
+                        detail: 'Animal Created',
+                        life: 3000
+                    });
+                }
 
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Animal Created',
-                    life: 3000
-                });
+                
             }
 
-          //  setAnimals(_animals as any);
+           // setAnimals(_animals as any);
             setAnimalDialog(false);
             setAnimal(emptyAnimal);
         }
@@ -209,7 +212,7 @@ const Crud = () => {
         setAnimal(_animal);
     };
 
-    const onBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>, birthDate: string) => {
+    const onBirthDateChange = (e: InputMaskChangeEvent, birthDate: string) => {
         const val = (e.target && e.target.value) || '';
         let _animal = { ...animal };
         _animal['birthDate'] = val;
@@ -402,7 +405,7 @@ const Crud = () => {
                         <div className="field">
                             <label htmlFor="birthDate">Data de Nascimento</label>
                             <InputMask  value={animal.birthDate} 
-                                        slotChar='mm/dd/yyyy' mask="99/99/9999" placeholder="dd/mm/aaaa"
+                                        slotChar='dd/mm/yyyy' mask="99/99/9999" placeholder="dd/mm/aaaa"
                                         onChange={(e) => onBirthDateChange(e, 'birthDate')} />
                         </div>
 

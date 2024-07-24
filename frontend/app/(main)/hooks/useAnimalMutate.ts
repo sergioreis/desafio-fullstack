@@ -14,7 +14,7 @@ export function useAnimalMutate(){
     const mutate = useMutation({
         mutationFn: postData,
         onSuccess: () => {
-            queryClient.invalidateQueries();
+            queryClient.invalidateQueries({ queryKey: ['"animal-data"'] });
         }    
     });
 

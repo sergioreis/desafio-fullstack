@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,8 +65,17 @@ public class AnimalService {
         newObj.setStatus(obj.getStatus());
     }*/
 
+    private LocalDate stringToLocaleData(String stringDate){
+        if(stringDate == null || stringDate.trim().equals("") ){
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localDate = LocalDate.parse(stringDate, formatter);
+        return localDate;
+    }
+
     public Animal fromDTO(AnimalDTO objDto) {
-        return new Animal(objDto.getId(), objDto.getName(),objDto.getDescription(),objDto.getImageUrl(), objDto.getBirthDate(), objDto.getCategory(),objDto.getStatus());
+        return new Animal(objDto.getId(), objDto.getName(),objDto.getDescription(),objDto.getImageUrl(), stringToLocaleData(objDto.getBirthDate()), objDto.getCategory(),objDto.getStatus());
     }
 
 }
