@@ -4,7 +4,7 @@ Desafio fullstack ReactJS + Spring Boot.
 
 ## BACKEND
 
-Dentro do diretório backend do projeto abrir um terminal de comandos
+Dentro do diretório "backend" do projeto abrir um terminal de comandos
 
 INICAR O APP SPRING BOOT
 
@@ -27,7 +27,7 @@ INICAR O APP SPRING BOOT
 
 ##  FRONTEND
 
-Dentro do diretório do projeto abrir um terminal de comandos
+Dentro do diretório "frontend" do projeto abrir um terminal de comandos
 
 1 - Criar/Baixar imagem a partir do Dockerfile
 
