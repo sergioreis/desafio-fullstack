@@ -34,6 +34,8 @@ Dentro do diretório do projeto abrir um terminal de comandos
 
  " docker build -t desafiofrontend_img  . "
 
+ OBS: O comando acima possui um " . " que precisa ser copiado tambem.
+
 2 - verificar imagens
 
  docker images
