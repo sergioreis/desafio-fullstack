@@ -40,7 +40,7 @@ const Crud = () => {
     const { data, isLoading } = useAnimalData();
     const { mutate:mutatePost, isSuccess:isSuccessPost, isPending } = useAnimalMutate();
     const { mutate:mutatePut, isSuccess:isSuccessPut} = useAnimalMutatePut();
-
+    const [refresh, setRefresh] = useState(false);
     const [animals, setAnimals] = useState(null);
     const [animalDialog, setAnimalDialog] = useState(false);
     const [alterarStatusAnimalDialog, setAlterarStatusAnimalDialog] = useState(false);
@@ -94,9 +94,9 @@ const Crud = () => {
                     "status": animal.status 
                 }
 
-                mutate(dataPersist);
+                mutatePost(dataPersist);
 
-                if(isSuccess){
+                if(isSuccessPost){
                     
                     toast.current?.show({
                         severity: 'success',
@@ -105,7 +105,7 @@ const Crud = () => {
                         life: 3000
                     });
                 }
-
+            setRefresh(!refresh);    
             setAnimalDialog(false);
             setAnimal(emptyAnimal);
         }
@@ -147,7 +147,7 @@ const Crud = () => {
                 life: 3000
             });
         }
-
+        setRefresh(!refresh);
         setAlterarStatusAnimalDialog(false);
         setAnimal(emptyAnimal); 
     };
