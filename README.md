@@ -47,6 +47,9 @@ Dentro do diretório do projeto abrir um terminal de comandos
 
  ## ENDERECOS e PORTAS
  FRONTEND: http://localhost:3000
+ 
  BACKEND: http://localhost:8080
+
+ SWAGGER: http://localhost:8080/swagger-ui/index.html
 
  
