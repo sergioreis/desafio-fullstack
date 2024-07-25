@@ -13,15 +13,14 @@ INICAR O APP SPRING BOOT
 
  " docker build -t desafiobackend_api_img  .  "
 
-2 - verificar imagens
+ OBS: O comando acima possui um " . " que precisa ser copiado tambem.
+
+2 - verificar se a imagem foi criada
 
  docker images
 
-3 - criar container a partir da imagem
 
- " docker run -d -p 8080:8080 desafiobackend_api_img "
-
-4 - INICIAR O POSTGRES e a API
+3 - INICIAR O POSTGRES e a API
 
   docker-compose up
 
